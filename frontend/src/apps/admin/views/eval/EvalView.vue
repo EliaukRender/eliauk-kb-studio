@@ -3,9 +3,9 @@ import { type DataTableColumns, NButton, useMessage } from 'naive-ui'
 import { computed, h, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { evalApi, indexesApi } from '@/api/admin'
-import { type EvalCase, type EvalReport, IndexStatus, type IndexVersion } from '@/types/api'
-import { errorMessage, formatPercent } from '@/utils/format'
+import { evalApi, indexesApi } from '@/apps/admin/api/admin'
+import { type EvalCase, type EvalReport, IndexStatus, type IndexVersion } from '@/apps/admin/types'
+import { errorMessage, formatPercent } from '@/shared/utils/format'
 
 import CaseForm from './components/CaseForm.vue'
 import EvalResultList from './components/EvalResultList.vue'

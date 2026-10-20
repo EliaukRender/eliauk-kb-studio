@@ -10,10 +10,10 @@ import {
 } from 'naive-ui'
 import { h, onMounted, ref } from 'vue'
 
-import { documentsApi } from '@/api/admin'
-import { DOCUMENT_STATUS_META } from '@/constants/status'
-import type { KbDocument } from '@/types/api'
-import { errorMessage, formatTime } from '@/utils/format'
+import { documentsApi } from '@/apps/admin/api/admin'
+import { DOCUMENT_STATUS_META } from '@/apps/admin/constants/status'
+import type { KbDocument } from '@/apps/admin/types'
+import { errorMessage, formatTime } from '@/shared/utils/format'
 
 import UploadPanel from './components/UploadPanel.vue'
 import VersionDrawer from './components/VersionDrawer.vue'

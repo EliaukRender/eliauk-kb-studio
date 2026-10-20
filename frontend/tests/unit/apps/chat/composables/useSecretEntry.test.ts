@@ -2,8 +2,8 @@ import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 
-import { useSecretEntry } from '@/composables/useSecretEntry'
-import { LOGO_CLICK_TARGET, LOGO_CLICK_WINDOW_MS } from '@/constants/secret-entry'
+import { useSecretEntry } from '@/apps/chat/composables/useSecretEntry'
+import { LOGO_CLICK_TARGET, LOGO_CLICK_WINDOW_MS } from '@/apps/chat/constants/secret-entry'
 
 function setup() {
   const onTrigger = vi.fn()

@@ -2,9 +2,9 @@
 import { type UploadFileInfo, useMessage } from 'naive-ui'
 import { ref } from 'vue'
 
-import { documentsApi } from '@/api/admin'
-import type { UploadResult } from '@/types/api'
-import { errorMessage } from '@/utils/format'
+import { documentsApi } from '@/apps/admin/api/admin'
+import type { UploadResult } from '@/apps/admin/types'
+import { errorMessage } from '@/shared/utils/format'
 
 const emit = defineEmits<{ uploaded: [] }>()
 const message = useMessage()

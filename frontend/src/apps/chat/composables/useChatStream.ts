@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 
-import { streamChat } from '@/api/chat'
-import type { Source } from '@/types/api'
+import { streamChat } from '@/apps/chat/api/chat'
+import type { Source } from '@/shared/types/rag'
 
 export type ChatMessage = {
   id: number

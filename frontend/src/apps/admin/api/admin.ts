@@ -1,3 +1,4 @@
+import { del, get, post, put } from '@/apps/admin/api/http'
 import type {
   DocumentVersion,
   EvalCase,
@@ -7,9 +8,7 @@ import type {
   KbDocument,
   RuntimeSettings,
   UploadResult,
-} from '@/types/api'
-
-import { del, get, post, put } from './http'
+} from '@/apps/admin/types'
 
 type TokenResponse = { token: string }
 

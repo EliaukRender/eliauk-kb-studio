@@ -1,4 +1,4 @@
-import { DocumentStatus, IndexStatus } from '@/types/api'
+import { DocumentStatus, IndexStatus } from '@/apps/admin/types'
 
 type TagType = 'default' | 'info' | 'success' | 'warning' | 'error'
 type StatusMeta = { label: string; type: TagType }

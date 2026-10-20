@@ -1,14 +1,17 @@
-import type { AppStatus, Source } from '@/types/api'
-import { parseSseBuffer } from '@/utils/sse'
+import type { AppStatus } from '@/apps/chat/types'
+import { parseSseBuffer } from '@/apps/chat/utils/sse'
+import { createHttpClient } from '@/shared/api/http-client'
+import type { Source } from '@/shared/types/rag'
 
-import { get } from './http'
+// 问答端接口无需鉴权
+const http = createHttpClient()
 
 export type ChatStreamHandlers = {
   onSources: (sources: Source[]) => void
   onToken: (token: string) => void
 }
 
-export const fetchStatus = () => get<AppStatus>('/status')
+export const fetchStatus = () => http.get<AppStatus>('/status')
 
 /** 问答接口是 POST + SSE，EventSource 只支持 GET，所以用 fetch 手动读取流 */
 export async function streamChat(

@@ -3,12 +3,13 @@ import { type MenuOption } from 'naive-ui'
 import { computed, h } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
-import { authApi } from '@/api/admin'
-import { useAdminStore } from '@/stores/admin'
+import { authApi } from '@/apps/admin/api/admin'
+import { useAdminSessionStore } from '@/apps/admin/stores/session'
+import { CHAT_URL } from '@/shared/config/app-links'
 
 const route = useRoute()
 const router = useRouter()
-const admin = useAdminStore()
+const admin = useAdminSessionStore()
 
 const MENU = [
   { name: 'admin-documents', label: '文档管理' },
@@ -27,7 +28,7 @@ const activeKey = computed(() => String(route.name))
 async function logout() {
   await authApi.logout().catch(() => undefined)
   admin.clear()
-  await router.push({ name: 'chat' })
+  await router.push({ name: 'admin-login' })
 }
 </script>
 
@@ -40,7 +41,7 @@ async function logout() {
       </div>
       <n-menu :value="activeKey" :options="menuOptions" />
       <div class="mt-auto flex flex-col gap-2 p-4">
-        <n-button block secondary @click="router.push({ name: 'chat' })">
+        <n-button block secondary tag="a" :href="CHAT_URL">
           <template #icon><i-ri-chat-3-line /></template>
           返回问答
         </n-button>

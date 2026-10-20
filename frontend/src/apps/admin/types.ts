@@ -1,3 +1,5 @@
+import type { Source } from '@/shared/types/rag'
+
 export const DocumentStatus = {
   Pending: 'pending',
   Indexed: 'indexed',
@@ -66,14 +68,6 @@ export type EvalCase = {
   should_refuse: boolean
 }
 
-export type Source = {
-  source: string
-  section: string
-  version: number | null
-  score: number
-  content: string
-}
-
 export type EvalResult = {
   case_id: number
   question: string
@@ -98,10 +92,4 @@ export type RuntimeSettings = {
   chunk_overlap: number
   top_k: number
   score_threshold: number
-}
-
-export type AppStatus = {
-  has_index: boolean
-  current_index: string | null
-  document_count: number
 }

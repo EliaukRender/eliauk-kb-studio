@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { EvalReport } from '@/types/api'
-import { formatPercent } from '@/utils/format'
+import type { EvalReport } from '@/apps/admin/types'
+import { formatPercent } from '@/shared/utils/format'
 
 defineProps<{ report: EvalReport }>()
 </script>

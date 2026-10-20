@@ -1,30 +1,24 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 
-import { fetchStatus } from '@/api/chat'
-import AdminLoginModal from '@/components/admin/AdminLoginModal.vue'
-import { useChatStream } from '@/composables/useChatStream'
-import { useSecretEntry } from '@/composables/useSecretEntry'
-import { useAdminStore } from '@/stores/admin'
-import type { AppStatus } from '@/types/api'
+import { fetchStatus } from '@/apps/chat/api/chat'
+import { useChatStream } from '@/apps/chat/composables/useChatStream'
+import { useSecretEntry } from '@/apps/chat/composables/useSecretEntry'
+import type { AppStatus } from '@/apps/chat/types'
+import { ADMIN_URL } from '@/shared/config/app-links'
 
 import ChatInput from './components/ChatInput.vue'
 import ChatMessageItem from './components/ChatMessageItem.vue'
 
-const router = useRouter()
-const admin = useAdminStore()
 const { messages, loading, send, stop, clear } = useChatStream()
 
 const status = ref<AppStatus>()
-const showLogin = ref(false)
 const listRef = ref<HTMLElement>()
 
-// 已登录时直接进后台，不用每次都输密码
-const { handleLogoClick, interceptCommand } = useSecretEntry(() => {
-  if (admin.isLoggedIn) void router.push({ name: 'admin-documents' })
-  else showLogin.value = true
-})
+// 问答端只负责跳转，登录与鉴权全部在管理应用内完成
+const { handleLogoClick, interceptCommand } = useSecretEntry(() =>
+  window.location.assign(ADMIN_URL),
+)
 
 function onSubmit(text: string) {
   if (interceptCommand(text)) return
@@ -79,7 +73,5 @@ onMounted(async () => {
     <footer class="pb-4">
       <ChatInput :loading="loading" @submit="onSubmit" @stop="stop" />
     </footer>
-
-    <AdminLoginModal v-model:show="showLogin" />
   </div>
 </template>

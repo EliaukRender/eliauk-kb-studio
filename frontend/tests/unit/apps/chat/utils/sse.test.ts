@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseSseBuffer } from '@/utils/sse'
+import { parseSseBuffer } from '@/apps/chat/utils/sse'
 
 describe('parseSseBuffer', () => {
   it('解析完整事件', () => {

@@ -2,8 +2,8 @@
 import { useMessage } from 'naive-ui'
 import { reactive } from 'vue'
 
-import { evalApi } from '@/api/admin'
-import { errorMessage } from '@/utils/format'
+import { evalApi } from '@/apps/admin/api/admin'
+import { errorMessage } from '@/shared/utils/format'
 
 const emit = defineEmits<{ created: [] }>()
 const message = useMessage()

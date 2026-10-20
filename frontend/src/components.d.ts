@@ -11,7 +11,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AdminLoginModal: typeof import('./../components/admin/AdminLoginModal.vue')['default']
     IRiBookOpenLine: typeof import('~icons/ri/book-open-line')['default']
     IRiChat3Line: typeof import('~icons/ri/chat3-line')['default']
     IRiChatSmile2Line: typeof import('~icons/ri/chat-smile2-line')['default']
@@ -41,7 +40,6 @@ declare module 'vue' {
     NLayoutSider: typeof import('naive-ui')['NLayoutSider']
     NMenu: typeof import('naive-ui')['NMenu']
     NMessageProvider: typeof import('naive-ui')['NMessageProvider']
-    NModal: typeof import('naive-ui')['NModal']
     NSelect: typeof import('naive-ui')['NSelect']
     NSlider: typeof import('naive-ui')['NSlider']
     NSpin: typeof import('naive-ui')['NSpin']

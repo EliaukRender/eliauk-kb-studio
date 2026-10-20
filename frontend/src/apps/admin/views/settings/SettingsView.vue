@@ -2,9 +2,9 @@
 import { useMessage } from 'naive-ui'
 import { onMounted, ref } from 'vue'
 
-import { settingsApi } from '@/api/admin'
-import type { RuntimeSettings } from '@/types/api'
-import { errorMessage } from '@/utils/format'
+import { settingsApi } from '@/apps/admin/api/admin'
+import type { RuntimeSettings } from '@/apps/admin/types'
+import { errorMessage } from '@/shared/utils/format'
 
 const message = useMessage()
 const form = ref<RuntimeSettings | null>(null)

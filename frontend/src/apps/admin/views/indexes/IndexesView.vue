@@ -4,10 +4,10 @@ import { type DataTableColumns, NButton, NSpace, NTag, useDialog, useMessage } f
 import { computed, h, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { indexesApi } from '@/api/admin'
-import { INDEX_STATUS_META } from '@/constants/status'
-import { type IndexList, IndexStatus, type IndexVersion } from '@/types/api'
-import { errorMessage, formatPercent, formatTime } from '@/utils/format'
+import { indexesApi } from '@/apps/admin/api/admin'
+import { INDEX_STATUS_META } from '@/apps/admin/constants/status'
+import { type IndexList, IndexStatus, type IndexVersion } from '@/apps/admin/types'
+import { errorMessage, formatPercent, formatTime } from '@/shared/utils/format'
 
 const message = useMessage()
 const dialog = useDialog()

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Source } from '@/types/api'
+import type { Source } from '@/shared/types/rag'
 
 defineProps<{ sources: Source[] }>()
 </script>

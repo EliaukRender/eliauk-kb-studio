@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ChatMessage } from '@/composables/useChatStream'
+import type { ChatMessage } from '@/apps/chat/composables/useChatStream'
 
 import SourceList from './SourceList.vue'
 

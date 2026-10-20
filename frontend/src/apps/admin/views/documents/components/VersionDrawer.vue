@@ -2,9 +2,9 @@
 import { useDialog, useMessage } from 'naive-ui'
 import { ref, watch } from 'vue'
 
-import { documentsApi } from '@/api/admin'
-import type { DocumentVersion, KbDocument } from '@/types/api'
-import { errorMessage, formatTime } from '@/utils/format'
+import { documentsApi } from '@/apps/admin/api/admin'
+import type { DocumentVersion, KbDocument } from '@/apps/admin/types'
+import { errorMessage, formatTime } from '@/shared/utils/format'
 
 const show = defineModel<boolean>('show', { required: true })
 const props = defineProps<{ document: KbDocument | null }>()
