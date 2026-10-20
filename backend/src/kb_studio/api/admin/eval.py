@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from kb_studio.auth import require_admin
 from kb_studio.db import eval_repo, index_versions_repo
 from kb_studio.evaluation.runner import run_eval
-from kb_studio.ingest.index_state import get_current_index
+from kb_studio.query.service import get_current_index
 
 router = APIRouter(prefix="/api/admin/eval", tags=["admin-eval"], dependencies=[Depends(require_admin)])
 

@@ -13,13 +13,12 @@ def collection_name(index_id: int) -> str:
 def create(embedding_model: str, chunk_size: int, chunk_overlap: int, status: str) -> dict:
     with get_conn() as conn:
         cur = conn.execute(
-            "INSERT INTO index_versions (embedding_model, chunk_size, chunk_overlap, status, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO index_versions (embedding_model, chunk_size, chunk_overlap, status, created_at)"
+            " VALUES (?, ?, ?, ?, ?)",
             (embedding_model, chunk_size, chunk_overlap, status, now()),
         )
         index_id = cur.lastrowid
-        conn.execute(
-            "UPDATE index_versions SET collection = ? WHERE id = ?", (collection_name(index_id), index_id)
-        )
+        conn.execute("UPDATE index_versions SET collection = ? WHERE id = ?", (collection_name(index_id), index_id))
     return get(index_id)
 
 

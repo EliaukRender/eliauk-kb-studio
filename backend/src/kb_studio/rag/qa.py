@@ -9,8 +9,11 @@ from kb_studio.rag.models import get_chat_model
 
 NO_CONTEXT = "（未检索到相关资料）"
 
-PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """你是本地知识库助手，只能根据 <context> 中的资料回答问题。
+PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """你是本地知识库助手，只能根据 <context> 中的资料回答问题。
 
 ## 规则
 - 资料中没有答案时，只回答“知识库中没有找到相关信息”，不要编造，也不要标注来源
@@ -21,9 +24,11 @@ PROMPT = ChatPromptTemplate.from_messages([
 
 <context>
 {context}
-</context>"""),
-    ("human", "{question}"),
-])
+</context>""",
+        ),
+        ("human", "{question}"),
+    ]
+)
 
 
 def format_docs(docs: list[Document]) -> str:

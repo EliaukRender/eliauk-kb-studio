@@ -46,8 +46,12 @@ def index_document(doc_id: int) -> dict:
     try:
         index = ensure_current_index()
         ids, chunks = build_chunks(
-            doc_id, version["version"], doc["filename"], raw_store.read_text(version["raw_path"]),
-            index["chunk_size"], index["chunk_overlap"],
+            doc_id,
+            version["version"],
+            doc["filename"],
+            raw_store.read_text(version["raw_path"]),
+            index["chunk_size"],
+            index["chunk_overlap"],
         )
         store = get_store(index)
         delete_doc_chunks(store, doc_id)

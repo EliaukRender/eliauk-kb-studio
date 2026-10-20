@@ -29,7 +29,8 @@ def get_by_filename(filename: str) -> dict | None:
 def create(filename: str, content_hash: str) -> int:
     with get_conn() as conn:
         cur = conn.execute(
-            "INSERT INTO documents (filename, current_version, content_hash, status, updated_at) VALUES (?, 0, ?, ?, ?)",
+            "INSERT INTO documents (filename, current_version, content_hash, status, updated_at)"
+            " VALUES (?, 0, ?, ?, ?)",
             (filename, content_hash, STATUS_PENDING, now()),
         )
         return cur.lastrowid
@@ -46,7 +47,8 @@ def next_version(doc_id: int) -> int:
 def add_version(doc_id: int, version: int, content_hash: str, raw_path: str) -> None:
     with get_conn() as conn:
         conn.execute(
-            "INSERT INTO document_versions (doc_id, version, content_hash, raw_path, created_at) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO document_versions (doc_id, version, content_hash, raw_path, created_at)"
+            " VALUES (?, ?, ?, ?, ?)",
             (doc_id, version, content_hash, raw_path, now()),
         )
 
@@ -70,7 +72,8 @@ def get_version(doc_id: int, version: int) -> dict | None:
 def set_current_version(doc_id: int, version: int, content_hash: str) -> None:
     with get_conn() as conn:
         conn.execute(
-            "UPDATE documents SET current_version = ?, content_hash = ?, status = ?, error = NULL, updated_at = ? WHERE id = ?",
+            "UPDATE documents SET current_version = ?, content_hash = ?, status = ?, error = NULL, updated_at = ?"
+            " WHERE id = ?",
             (version, content_hash, STATUS_PENDING, now(), doc_id),
         )
 

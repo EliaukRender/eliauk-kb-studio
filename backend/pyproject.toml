@@ -20,7 +20,9 @@ dependencies = [
 ]
 
 [project.scripts]
-kb-studio = "kb_studio:main"
+kb-studio = "kb_studio.cli:run_all"
+kb-studio-chat = "kb_studio.cli:run_chat"
+kb-studio-admin = "kb_studio.cli:run_admin"
 
 [build-system]
 requires = ["uv_build>=0.13.1,<0.14.0"]
@@ -28,5 +30,54 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "import-linter>=2.15",
     "pytest>=9.1.1",
+    "ruff>=0.17.1",
 ]
+
+# 架构约束：由 `uv run lint-imports` 检查，规则说明见 docs/开发规范.md「边界与分层」
+[tool.importlinter]
+root_package = "kb_studio"
+
+[[tool.importlinter.contracts]]
+name = "分层：上层可以依赖下层，下层不能反向依赖"
+type = "layers"
+layers = [
+    "kb_studio.cli",
+    "kb_studio.apps",
+    "kb_studio.api",
+    "kb_studio.ingest | kb_studio.auth",
+    "kb_studio.evaluation",
+    "kb_studio.query",
+    "kb_studio.rag | kb_studio.db | kb_studio.storage",
+    "kb_studio.settings",
+]
+
+[[tool.importlinter.contracts]]
+name = "问答端只读：不得依赖管理端、鉴权、写入链路与评估（含间接依赖）"
+type = "forbidden"
+source_modules = ["kb_studio.api.public", "kb_studio.apps.chat_app"]
+forbidden_modules = [
+    "kb_studio.api.admin",
+    "kb_studio.auth",
+    "kb_studio.ingest",
+    "kb_studio.evaluation",
+    "kb_studio.storage",
+]
+
+[[tool.importlinter.contracts]]
+name = "问答与管理两个应用互相独立"
+type = "independence"
+modules = ["kb_studio.api.public", "kb_studio.api.admin"]
+
+[[tool.importlinter.contracts]]
+name = "两个应用入口互相独立"
+type = "independence"
+modules = ["kb_studio.apps.chat_app", "kb_studio.apps.admin_app"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

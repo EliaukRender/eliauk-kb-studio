@@ -22,8 +22,12 @@ def run_rebuild(index_id: int) -> None:
         for doc in docs:
             version = documents_repo.get_version(doc["id"], doc["current_version"])
             ids, chunks = build_chunks(
-                doc["id"], version["version"], doc["filename"], raw_store.read_text(version["raw_path"]),
-                index["chunk_size"], index["chunk_overlap"],
+                doc["id"],
+                version["version"],
+                doc["filename"],
+                raw_store.read_text(version["raw_path"]),
+                index["chunk_size"],
+                index["chunk_overlap"],
             )
             if chunks:
                 store.add_documents(chunks, ids=ids)

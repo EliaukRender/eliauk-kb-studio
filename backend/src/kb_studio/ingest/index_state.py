@@ -1,14 +1,10 @@
 from kb_studio.db import documents_repo, index_versions_repo, kv_repo
+from kb_studio.query.service import get_current_index
 from kb_studio.rag.vectorstore import drop_collection, get_store
 
 
 class IndexStateError(ValueError):
     pass
-
-
-def get_current_index() -> dict | None:
-    index_id = kv_repo.get_current_index_id()
-    return index_versions_repo.get(index_id) if index_id else None
 
 
 def ensure_current_index() -> dict:
@@ -27,9 +23,7 @@ def ensure_current_index() -> dict:
 def refresh_counts(index: dict) -> None:
     """增量入库后按 collection 实际内容回写统计，保证索引列表里的文档数、块数准确。"""
     metas = get_store(index).get(include=["metadatas"])["metadatas"]
-    index_versions_repo.update(
-        index["id"], doc_count=len({m.get("doc_id") for m in metas}), chunk_count=len(metas)
-    )
+    index_versions_repo.update(index["id"], doc_count=len({m.get("doc_id") for m in metas}), chunk_count=len(metas))
 
 
 def sync_documents_with_index(index: dict) -> None:
@@ -43,7 +37,9 @@ def sync_documents_with_index(index: dict) -> None:
         versions = {m.get("version") for m in metas}
         if versions != {doc["current_version"]}:
             documents_repo.set_status(
-                doc["id"], documents_repo.STATUS_PENDING, len(metas),
+                doc["id"],
+                documents_repo.STATUS_PENDING,
+                len(metas),
                 f"当前索引中是 v{max(versions)}，与当前版本 v{doc['current_version']} 不一致",
             )
             continue

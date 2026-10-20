@@ -1,8 +1,7 @@
 import re
 
-from kb_studio.db import eval_repo, kv_repo
-from kb_studio.rag import qa
-from kb_studio.rag.vectorstore import get_store
+from kb_studio.db import eval_repo
+from kb_studio.query import service
 
 REFUSAL_MARK = "没有找到"
 
@@ -20,21 +19,22 @@ def judge(answer: str, expected_keywords: list[str], should_refuse: bool) -> boo
 
 
 def run_eval(index: dict) -> dict:
-    s = kv_repo.get_runtime_settings()
-    store = get_store(index)
+    # 与线上问答走同一条查询链路，评估结果才能代表真实效果
     results = []
     for case in eval_repo.list_cases():
-        hits = qa.retrieve(store, case["question"], s["top_k"], s["score_threshold"])
-        answer = qa.answer(case["question"], [doc for doc, _ in hits])
-        results.append({
-            "case_id": case["id"],
-            "question": case["question"],
-            "expected_keywords": case["expected_keywords"],
-            "should_refuse": case["should_refuse"],
-            "answer": answer,
-            "passed": judge(answer, case["expected_keywords"], case["should_refuse"]),
-            "sources": [qa.to_source(doc, score) for doc, score in hits],
-        })
+        hits = service.search(index, case["question"])
+        answer = service.answer(case["question"], hits)
+        results.append(
+            {
+                "case_id": case["id"],
+                "question": case["question"],
+                "expected_keywords": case["expected_keywords"],
+                "should_refuse": case["should_refuse"],
+                "answer": answer,
+                "passed": judge(answer, case["expected_keywords"], case["should_refuse"]),
+                "sources": service.to_sources(hits),
+            }
+        )
     passed = sum(r["passed"] for r in results)
     return {
         "index_id": index["id"],
