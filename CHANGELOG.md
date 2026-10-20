@@ -7,8 +7,22 @@
 
 ### 新增
 
-- `docs` 架构设计文档：模块划分、数据模型、状态机、核心流程、设计取舍
-- `docs` 变更管理规范与架构决策记录（ADR 0001–0006）
+- `server` 问答与管理拆分为两个独立应用：问答 `:8765`（只读）、管理 `:8766`（读写加鉴权），各自只托管自己的前端入口页（[ADR 0007](./docs/adr/0007-应用边界与可拆分部署.md)）
+  - `kb-studio` 在同一进程中启动两个应用；`kb-studio-chat`、`kb-studio-admin` 用于分进程部署
+  - 部署配置改为环境变量：`KB_HOST`、`KB_CHAT_PORT`、`KB_ADMIN_PORT`、`KB_DATA_DIR`、`KB_CHROMA_URL`、`KB_FRONTEND_DIST`
+- `query` 只读查询层：问答端和回归测试共用同一条检索与生成链路
+- `rag` 支持 Chroma 服务端（`KB_CHROMA_URL`），分进程部署时必须使用；本地客户端改为按进程缓存
+- `web-shared` / `web-chat` / `web-admin` 前端改为多页构建：`index.html`（问答）、`admin.html`（管理）、`src/shared`（共享层）
+  - 应用地址可在构建时用 `VITE_CHAT_URL`、`VITE_ADMIN_URL` 配置，`VITE_SECRET_ENTRY=false` 可关闭隐藏入口
+- `build` 架构边界自动检查：后端 import-linter（4 条契约）、前端 ESLint `boundary/*` 规则；`scripts/check.sh` 一键执行全部检查
+- `build` 后端接入 ruff，并检查单文件行数上限
+- `docs` 架构设计、开发规范、变更管理、ADR 0001–0007；`AGENTS.md` / `CLAUDE.md` 约束 AI 辅助开发
+
+### 变更
+
+- **破坏性** `web-admin` 后台地址由 `:8765/#/admin` 改为 `:8766`；登录由问答页内的弹窗改为管理应用的独立登录页，未登录时跳转登录页并保留来源页
+- `web-chat` 隐藏入口只负责跳转到后台地址，问答应用不再包含任何管理端代码
+- **破坏性** `server` 后端入口由 `kb_studio.main:app` 改为 `kb_studio.cli`（`kb_studio.apps.chat_app:app`、`kb_studio.apps.admin_app:app`）
 
 ## [0.1.0] - 2026-10-20
 

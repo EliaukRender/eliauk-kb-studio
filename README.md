@@ -14,18 +14,37 @@
 # 1. 配置密钥：DeepSeek（回答）+ 阿里百炼（向量化）
 cp backend/.env.example backend/.env   # 填写 DEEPSEEK_API_KEY、DASHSCOPE_API_KEY
 
-# 2. 启动后端（监听 127.0.0.1:8765）
+# 2. 启动后端：问答 127.0.0.1:8765 + 管理 127.0.0.1:8766
 cd backend && uv run kb-studio
 ```
+
+问答和管理是两个独立应用（[ADR 0007](docs/adr/0007-应用边界与可拆分部署.md)）：
+
+| 应用 | 生产模式地址 | 开发模式地址 |
+| --- | --- | --- |
+| 问答 | <http://127.0.0.1:8765> | <http://127.0.0.1:5174/> |
+| 管理后台 | <http://127.0.0.1:8766> | <http://127.0.0.1:5174/admin.html> |
 
 前端有两种运行方式：
 
 | 方式 | 命令 | 访问地址 |
 | --- | --- | --- |
-| 开发模式（热更新） | `cd frontend && pnpm install && pnpm dev` | <http://127.0.0.1:5174> |
-| 生产模式 | `cd frontend && pnpm build`，然后重启后端 | <http://127.0.0.1:8765> |
+| 开发模式（热更新） | `cd frontend && pnpm install && pnpm dev` | 见上表开发模式地址 |
+| 生产模式 | `cd frontend && pnpm build`，然后重启后端 | 见上表生产模式地址 |
 
-生产模式下由后端直接托管 `frontend/dist`，只需要启动一个进程。
+生产模式下由两个后端应用分别托管各自的入口页，只需要启动 `kb-studio` 一个进程。
+
+### 部署配置
+
+| 环境变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `KB_HOST` | `127.0.0.1` | 监听地址 |
+| `KB_CHAT_PORT` / `KB_ADMIN_PORT` | `8765` / `8766` | 问答、管理端口 |
+| `KB_DATA_DIR` | `data/` | SQLite、原文件、本地向量库所在目录 |
+| `KB_CHROMA_URL` | 空（本地文件） | Chroma 服务端地址；用 `kb-studio-chat`、`kb-studio-admin` 分进程部署时必须设置 |
+| `KB_FRONTEND_DIST` | `frontend/dist` | 前端构建产物目录 |
+| `VITE_CHAT_URL` / `VITE_ADMIN_URL` | 本机两个端口 | 前端构建时设置，两个应用互相跳转的地址 |
+| `VITE_SECRET_ENTRY` | `true` | 设为 `false` 关闭问答端的隐藏入口 |
 
 ## 进入管理后台
 
@@ -35,7 +54,7 @@ cd backend && uv run kb-studio
 - 连续点击左上角 Logo 5 次（2 秒内）
 - 按 `Cmd + Shift + A`（Windows 为 `Ctrl + Shift + A`）
 
-第一次进入需要设置管理员密码，之后每次输入密码登录。登录状态保存在浏览器标签页里，关闭标签页或重启后端后需要重新登录。直接访问 `#/admin` 地址会被退回问答页。
+触发后会跳转到管理应用。第一次进入需要设置管理员密码，之后每次输入密码登录。登录状态保存在浏览器标签页里，关闭标签页或重启后端后需要重新登录。也可以直接访问管理地址。
 
 > 暗门只是把入口藏起来，真正起保护作用的是密码。后端只监听本机回环地址，局域网内其他设备无法访问。
 
@@ -79,19 +98,20 @@ data/raw/<doc_id>/v<n>/  →  data/app.db（SQLite）       →  data/chroma/（
 
 ```
 backend/src/kb_studio/
-  api/           路由：问答（SSE 流式）、鉴权、文档、索引、回归测试、设置
-  db/            SQLite 表结构与各表的读写
-  storage/       原文件按版本落盘
-  rag/           模型工厂、切分、向量库、检索与回答
-  ingest/        增量入库、索引版本状态、全量重建
-  evaluation/    回归测试与判定规则
-  auth.py        管理员密码（scrypt）与登录 token
-frontend/src/
-  api/           后端接口封装；chat.ts 用 fetch 读取 SSE 流
-  composables/   useSecretEntry（暗门）、useChatStream（流式问答）
-  views/chat/    问答页
-  views/admin/   后台四个页面
-data/            运行时数据（已 gitignore），删掉即恢复到初始状态
+  cli.py · apps/       启动命令与两个应用：chat_app（:8765）、admin_app（:8766）
+  api/public/          问答端接口（只读）
+  api/admin/           管理端接口：鉴权、文档、索引、回归测试、设置
+  query/               只读查询层，问答端与评估共用
+  ingest/              写入链路：增量入库、索引版本、全量重建
+  evaluation/          回归测试与判定规则
+  rag/ · db/ · storage/  RAG 能力、SQLite、原文件存储
+frontend/
+  index.html · admin.html  两个入口页
+  src/apps/chat/       问答应用（含暗门）
+  src/apps/admin/      管理应用（登录与后台页面）
+  src/shared/          共享层：HTTP 客户端、外壳、应用地址、主题、工具
+scripts/check.sh       一键质量检查
+data/                  运行时数据（已 gitignore），删掉即恢复到初始状态
 ```
 
 ## 文档
@@ -101,18 +121,14 @@ data/            运行时数据（已 gitignore），删掉即恢复到初始�
 | [CHANGELOG.md](CHANGELOG.md) | 各版本的变更，每条带模块标签 |
 | [docs/架构设计.md](docs/架构设计.md) | 当前架构：模块、数据模型、流程、取舍 |
 | [docs/adr/](docs/adr/README.md) | 架构决策记录：每个关键决策的背景与理由 |
+| [docs/开发规范.md](docs/开发规范.md) | 边界与分层、命名、测试、Git 工作流、完成标准 |
 | [docs/变更管理.md](docs/变更管理.md) | 模块标签、changelog 书写规范、版本号与发版流程 |
+| [AGENTS.md](AGENTS.md) | AI 编码助手必须遵守的规则（`CLAUDE.md` 引用它） |
 
 ## 开发命令
 
 ```bash
-# 后端
-cd backend
-uv run pytest                 # 单元测试
-
-# 前端
-cd frontend
-pnpm test                     # 单元测试
-pnpm typecheck                # 类型检查
-pnpm lint                     # ESLint（单文件 250 行上限）+ Prettier
+scripts/check.sh              # 全量检查：ruff、架构边界、行数、pytest、ESLint、类型检查、vitest、构建
 ```
+
+日常开发在 `develop` 分支进行，版本确定后再合并到 `main`，见 [开发规范 · Git 工作流](docs/开发规范.md#git-工作流)。
