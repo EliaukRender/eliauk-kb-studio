@@ -1,0 +1,48 @@
+{
+  "name": "kb-studio-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@11.8.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint . && prettier --check src tests",
+    "format": "prettier --write src tests",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@vueuse/core": "^15.0.0",
+    "axios": "^1.20.0",
+    "naive-ui": "^2.45.3",
+    "pinia": "^4.1.0",
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@iconify-json/ri": "^1.2.10",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.6.5",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "@vue/eslint-config-typescript": "^14.9.0",
+    "@vue/test-utils": "^2.5.1",
+    "eslint": "^10.13.0",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
+    "eslint-plugin-vue": "^10.11.1",
+    "globals": "^17.13.0",
+    "happy-dom": "^21.0.3",
+    "jiti": "^2.7.0",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "unplugin-icons": "^24.0.0",
+    "unplugin-vue-components": "^32.1.0",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5",
+    "vue-tsc": "^3.3.13"
+  }
+}

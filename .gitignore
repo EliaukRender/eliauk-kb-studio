@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[oc]
+.venv/
+.pytest_cache/
+
+# 前端
+node_modules/
+frontend/dist/
+
+# 密钥与本地数据（SQLite、原文件、向量库）
+.env
+data/

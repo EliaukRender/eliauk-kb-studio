@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 语义色映射为 Tailwind 工具类：bg-surface / text-fg / border-line ... */
+@theme inline {
+  --color-bg: var(--app-bg);
+  --color-surface: var(--app-surface);
+  --color-elevated: var(--app-elevated);
+  --color-fg: var(--app-fg);
+  --color-muted: var(--app-muted);
+  --color-line: var(--app-line);
+  --color-primary: var(--app-primary);
+}
+
+@theme {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei',
+    'Segoe UI', sans-serif;
+}
+
+:root {
+  --app-primary: #4f6ef7;
+  --app-bg: #f5f6fa;
+  --app-surface: #ffffff;
+  --app-elevated: #f0f2f7;
+  --app-fg: #1f2129;
+  --app-muted: #8a8d99;
+  --app-line: #e6e8ef;
+
+  color-scheme: light;
+}
+
+.dark {
+  --app-bg: #15161a;
+  --app-surface: #1c1d22;
+  --app-elevated: #25262d;
+  --app-fg: #ececf1;
+  --app-muted: #8b8d98;
+  --app-line: #2c2d35;
+
+  color-scheme: dark;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  @apply bg-bg font-sans text-fg antialiased;
+}
