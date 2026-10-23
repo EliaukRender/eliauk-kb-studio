@@ -4,7 +4,7 @@ from pathlib import Path
 from kb_studio.db import documents_repo
 from kb_studio.ingest.index_state import ensure_current_index, refresh_counts
 from kb_studio.rag.splitter import build_chunks
-from kb_studio.rag.vectorstore import delete_doc_chunks, get_store
+from kb_studio.rag.vectorstore import delete_doc_chunks, delete_docs_chunks, get_store
 from kb_studio.settings import SUPPORTED_SUFFIXES
 from kb_studio.storage import raw_store
 
@@ -89,6 +89,23 @@ def delete_document(doc_id: int) -> None:
     delete_doc_chunks(get_store(index), doc_id)
     documents_repo.set_status(doc_id, documents_repo.STATUS_DELETED)
     refresh_counts(index)
+
+
+def delete_documents(doc_ids: list[int]) -> list[int]:
+    """批量软删除，返回实际删除的 id；不存在或已删除的 id 忽略。向量库和计数各只操作一次。"""
+    ids = [
+        d
+        for d in dict.fromkeys(doc_ids)
+        if (doc := documents_repo.get(d)) and doc["status"] != documents_repo.STATUS_DELETED
+    ]
+    if not ids:
+        return []
+    index = ensure_current_index()
+    delete_docs_chunks(get_store(index), ids)
+    for doc_id in ids:
+        documents_repo.set_status(doc_id, documents_repo.STATUS_DELETED)
+    refresh_counts(index)
+    return ids
 
 
 def rollback_document(doc_id: int, version: int) -> dict:

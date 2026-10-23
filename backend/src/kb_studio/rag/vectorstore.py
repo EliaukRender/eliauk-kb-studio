@@ -32,6 +32,10 @@ def delete_doc_chunks(store: Chroma, doc_id: int) -> None:
     store.delete(where={"doc_id": doc_id})
 
 
+def delete_docs_chunks(store: Chroma, doc_ids: list[int]) -> None:
+    store.delete(where={"doc_id": {"$in": doc_ids}})
+
+
 def drop_collection(collection: str) -> None:
     client = _client()
     if collection in [c.name for c in client.list_collections()]:

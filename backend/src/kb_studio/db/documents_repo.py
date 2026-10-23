@@ -14,6 +14,26 @@ def list_documents(include_deleted: bool = False) -> list[dict]:
         return rows_to_dicts(conn.execute(sql + " ORDER BY updated_at DESC").fetchall())
 
 
+def _escape_like(text: str) -> str:
+    return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
+def page_documents(keyword: str, offset: int, limit: int) -> tuple[list[dict], int]:
+    """按文件名模糊查找（不区分英文大小写）并分页，返回当前页和总数；不含已删除文档。"""
+    where = f"status != '{STATUS_DELETED}'"
+    params: list = []
+    if keyword:
+        where += " AND filename LIKE ? ESCAPE '\\'"
+        params.append(f"%{_escape_like(keyword)}%")
+    with get_conn() as conn:
+        total = conn.execute(f"SELECT COUNT(*) AS n FROM documents WHERE {where}", params).fetchone()["n"]
+        rows = conn.execute(
+            f"SELECT * FROM documents WHERE {where} ORDER BY updated_at DESC, id DESC LIMIT ? OFFSET ?",
+            [*params, limit, offset],
+        ).fetchall()
+    return rows_to_dicts(rows), total
+
+
 def get(doc_id: int) -> dict | None:
     with get_conn() as conn:
         row = conn.execute("SELECT * FROM documents WHERE id = ?", (doc_id,)).fetchone()

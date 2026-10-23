@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
+from pydantic import BaseModel, Field
 
 from kb_studio.auth import require_admin
 from kb_studio.db import documents_repo
@@ -12,6 +12,10 @@ class RollbackRequest(BaseModel):
     version: int
 
 
+class BatchDeleteRequest(BaseModel):
+    ids: list[int] = Field(min_length=1, max_length=100)
+
+
 def _get_or_404(doc_id: int) -> dict:
     doc = documents_repo.get(doc_id)
     if not doc:
@@ -20,8 +24,18 @@ def _get_or_404(doc_id: int) -> dict:
 
 
 @router.get("")
-def list_documents() -> list[dict]:
-    return documents_repo.list_documents()
+def list_documents(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    keyword: str = Query("", max_length=100),
+) -> dict:
+    items, total = documents_repo.page_documents(keyword.strip(), (page - 1) * page_size, page_size)
+    return {"items": items, "total": total, "page": page, "page_size": page_size}
+
+
+@router.post("/batch-delete")
+def batch_delete(req: BatchDeleteRequest) -> dict:
+    return {"deleted": incremental.delete_documents(req.ids)}
 
 
 # 用同步函数：入库要调用 Embedding 接口，放在 async 里会阻塞事件循环，同步接口由 FastAPI 放进线程池执行
