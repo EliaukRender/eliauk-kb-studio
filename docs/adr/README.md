@@ -21,6 +21,13 @@
 | [0006](./0006-回归测试关键词判定.md) | 回归测试采用关键词判定 | 已采纳 | `eval` |
 | [0007](./0007-应用边界与可拆分部署.md) | 应用边界与可拆分部署 | 已采纳 | `server` `api-public` `api-admin` `query` `web-*` |
 | [0008](./0008-模型输出渲染管线.md) | 模型输出渲染管线 | 已采纳 | `web-shared` `web-chat` `web-admin` `eval` |
+| [0009](./0009-连接器抽象与文档身份规则.md) | 连接器抽象与文档身份规则 | 已采纳 | `ingest` `db` `storage` `query` `api-admin` |
+| [0010](./0010-用户身份与会话.md) | 用户身份与会话 | 提议中 | `auth` `db` `api-public` `api-admin` `web-*` |
+| [0011](./0011-文档权限模型与检索过滤.md) | 文档权限模型与检索过滤 | 提议中 | `ingest` `db` `query` `eval` `api-public` |
+| [0012](./0012-混合检索与重排序.md) | 混合检索与重排序 | 提议中 | `query` `rag` `ingest` `eval` |
+| [0013](./0013-会话存储与质量闭环.md) | 会话存储与质量闭环 | 提议中 | `query` `eval` `db` `api-public` `api-admin` |
+| [0014](./0014-服务端存储与任务队列.md) | 服务端存储与任务队列 | 提议中 | `server` `db` `storage` `rag` `ingest` |
+| [0015](./0015-会话服务与独立数据库.md) | 会话服务与独立数据库 | 提议中 | `conversation` `server` `api-public` `api-admin` |
 
 ## 模板
 
