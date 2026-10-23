@@ -19,11 +19,15 @@
 - `docs` 架构设计、开发规范、变更管理、ADR 0001–0008；`AGENTS.md` / `CLAUDE.md` 约束 AI 辅助开发
 - `web-shared` / `web-chat` / `web-admin` 模型回答按 Markdown 渲染，问答页与回归测试结果共用同一条渲染管线（[ADR 0008](./docs/adr/0008-模型输出渲染管线.md)）
   - 修正紧贴中文标点的加粗无法识别；流式输出期间自动补全未闭合的语法
+- `web-admin` 文档列表与上传拆分为两个独立页面；文档列表支持分页、按文件名查找、勾选删除和删除本页
+  - 页码、每页条数和关键词保存在地址栏，刷新或从上传页返回后保持不变
+- `api-admin` 新增 `POST /api/admin/documents/batch-delete` 批量软删除
 
 ### 变更
 
 - **破坏性** `web-admin` 后台地址由 `:8765/#/admin` 改为 `:8766`；登录由问答页内的弹窗改为管理应用的独立登录页，未登录时跳转登录页并保留来源页
 - `web-chat` 隐藏入口只负责跳转到后台地址，问答应用不再包含任何管理端代码
+- **破坏性** `api-admin` `GET /api/admin/documents` 改为分页接口，支持 `page`、`page_size`（上限 100）、`keyword` 参数，返回 `{items, total, page, page_size}`
 - `rag` Prompt 约定回答使用 Markdown 排版，不输出 HTML 和图片
 - **破坏性** `server` 后端入口由 `kb_studio.main:app` 改为 `kb_studio.cli`（`kb_studio.apps.chat_app:app`、`kb_studio.apps.admin_app:app`）
 
