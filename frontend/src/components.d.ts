@@ -15,6 +15,7 @@ declare module 'vue' {
     IRiChat3Line: typeof import('~icons/ri/chat3-line')['default']
     IRiChatSmile2Line: typeof import('~icons/ri/chat-smile2-line')['default']
     IRiHammerLine: typeof import('~icons/ri/hammer-line')['default']
+    IRiSearchLine: typeof import('~icons/ri/search-line')['default']
     IRiSendPlaneFill: typeof import('~icons/ri/send-plane-fill')['default']
     IRiSettings4Line: typeof import('~icons/ri/settings4-line')['default']
     IRiStopCircleLine: typeof import('~icons/ri/stop-circle-line')['default']

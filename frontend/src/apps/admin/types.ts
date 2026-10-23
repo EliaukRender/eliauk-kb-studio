@@ -19,6 +19,15 @@ export type KbDocument = {
   updated_at: string
 }
 
+export type DocumentPage = {
+  items: KbDocument[]
+  total: number
+  page: number
+  page_size: number
+}
+
+export type DocumentQuery = { page: number; pageSize: number; keyword: string }
+
 export type DocumentVersion = {
   doc_id: number
   version: number

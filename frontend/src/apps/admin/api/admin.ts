@@ -1,5 +1,7 @@
 import { del, get, post, put } from '@/apps/admin/api/http'
 import type {
+  DocumentPage,
+  DocumentQuery,
   DocumentVersion,
   EvalCase,
   EvalReport,
@@ -20,7 +22,10 @@ export const authApi = {
 }
 
 export const documentsApi = {
-  list: () => get<KbDocument[]>('/admin/documents'),
+  list: ({ page, pageSize, keyword }: DocumentQuery) => {
+    const query = new URLSearchParams({ page: String(page), page_size: String(pageSize), keyword })
+    return get<DocumentPage>(`/admin/documents?${query}`)
+  },
   upload: (files: File[]) => {
     const form = new FormData()
     files.forEach((f) => form.append('files', f))
@@ -31,6 +36,8 @@ export const documentsApi = {
     post<KbDocument>(`/admin/documents/${id}/rollback`, { version }),
   reindex: (id: number) => post<KbDocument>(`/admin/documents/${id}/reindex`),
   remove: (id: number) => del<void>(`/admin/documents/${id}`),
+  batchRemove: (ids: number[]) =>
+    post<{ deleted: number[] }>('/admin/documents/batch-delete', { ids }),
 }
 
 export const indexesApi = {

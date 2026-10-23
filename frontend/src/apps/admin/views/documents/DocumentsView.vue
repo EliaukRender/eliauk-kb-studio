@@ -1,41 +1,30 @@
 <script setup lang="ts">
-import {
-  type DataTableColumns,
-  NButton,
-  NSpace,
-  NTag,
-  NTooltip,
-  useDialog,
-  useMessage,
-} from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
+import { type PaginationProps, useDialog, useMessage } from 'naive-ui'
+import { computed, ref, watch } from 'vue'
 
 import { documentsApi } from '@/apps/admin/api/admin'
-import { DOCUMENT_STATUS_META } from '@/apps/admin/constants/status'
+import { PAGE_SIZES, useDocumentList } from '@/apps/admin/composables/useDocumentList'
 import type { KbDocument } from '@/apps/admin/types'
-import { errorMessage, formatTime } from '@/shared/utils/format'
+import { errorMessage } from '@/shared/utils/format'
 
-import UploadPanel from './components/UploadPanel.vue'
 import VersionDrawer from './components/VersionDrawer.vue'
+import { createDocumentColumns } from './document-columns'
 
 const message = useMessage()
 const dialog = useDialog()
+const { items, total, loading, checkedIds, query, update, load, removeMany } = useDocumentList()
 
-const documents = ref<KbDocument[]>([])
-const loading = ref(false)
+const keyword = ref(query.value.keyword)
+watch(
+  () => query.value.keyword,
+  (k) => (keyword.value = k),
+)
+const search = () => update({ keyword: keyword.value.trim(), page: 1 })
+const searchDebounced = useDebounceFn(search, 300)
+
 const selected = ref<KbDocument | null>(null)
 const showVersions = ref(false)
-
-async function load() {
-  loading.value = true
-  try {
-    documents.value = await documentsApi.list()
-  } catch (e) {
-    message.error(errorMessage(e))
-  } finally {
-    loading.value = false
-  }
-}
 
 async function reindex(doc: KbDocument) {
   try {
@@ -48,70 +37,93 @@ async function reindex(doc: KbDocument) {
   await load()
 }
 
-function remove(doc: KbDocument) {
+function confirmRemove(docs: KbDocument[], title: string) {
+  if (!docs.length) return
+  const names = docs.slice(0, 5).map((d) => d.filename)
+  const more = docs.length > names.length ? ` 等 ${docs.length} 个文档` : ''
   dialog.warning({
-    title: '删除文档',
-    content: `从当前索引中移除 ${doc.filename}。原文件和版本记录会保留，重新上传即可恢复。`,
+    title,
+    content: `从当前索引中移除：${names.join('、')}${more}。原文件和版本记录会保留，重新上传即可恢复。`,
     positiveText: '删除',
     negativeText: '取消',
-    onPositiveClick: async () => {
-      await documentsApi.remove(doc.id).catch((e) => message.error(errorMessage(e)))
-      await load()
-    },
+    onPositiveClick: () => removeMany(docs.map((d) => d.id)),
   })
 }
 
-function openVersions(doc: KbDocument) {
-  selected.value = doc
-  showVersions.value = true
-}
+const checkedDocs = computed(() => items.value.filter((d) => checkedIds.value.includes(d.id)))
 
-function renderStatus(doc: KbDocument) {
-  const meta = DOCUMENT_STATUS_META[doc.status]
-  const tag = h(NTag, { type: meta.type, size: 'small', bordered: false }, () => meta.label)
-  if (!doc.error) return tag
-  return h(NTooltip, null, { trigger: () => tag, default: () => doc.error })
-}
-
-const columns: DataTableColumns<KbDocument> = [
-  { title: '文件名', key: 'filename', ellipsis: { tooltip: true } },
-  { title: '版本', key: 'current_version', width: 70, render: (d) => `v${d.current_version}` },
-  { title: '状态', key: 'status', width: 90, render: renderStatus },
-  { title: '块数', key: 'chunk_count', width: 70 },
-  { title: '更新时间', key: 'updated_at', width: 170, render: (d) => formatTime(d.updated_at) },
-  {
-    title: '操作',
-    key: 'actions',
-    width: 220,
-    render: (d) =>
-      h(NSpace, { size: 'small' }, () => [
-        h(NButton, { size: 'tiny', onClick: () => openVersions(d) }, () => '版本'),
-        h(NButton, { size: 'tiny', onClick: () => reindex(d) }, () => '重新入库'),
-        h(
-          NButton,
-          { size: 'tiny', type: 'error', ghost: true, onClick: () => remove(d) },
-          () => '删除',
-        ),
-      ]),
+const columns = createDocumentColumns({
+  versions: (d) => {
+    selected.value = d
+    showVersions.value = true
   },
-]
+  reindex,
+  remove: (d) => confirmRemove([d], '删除文档'),
+})
 
-onMounted(load)
+const pagination = computed<PaginationProps>(() => ({
+  page: query.value.page,
+  pageSize: query.value.pageSize,
+  itemCount: total.value,
+  pageSizes: PAGE_SIZES,
+  showSizePicker: true,
+  prefix: ({ itemCount }) => `共 ${itemCount} 个`,
+}))
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <h2 class="text-lg font-semibold">文档管理</h2>
-    <UploadPanel @uploaded="load" />
-    <n-card title="文档列表" size="small">
-      <template #header-extra>
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold">文档列表</h2>
+      <RouterLink :to="{ name: 'admin-upload' }">
+        <n-button type="primary" size="small">上传文档</n-button>
+      </RouterLink>
+    </div>
+    <n-card size="small">
+      <div class="mb-3 flex flex-wrap items-center gap-2">
+        <n-input
+          v-model:value="keyword"
+          class="max-w-72"
+          size="small"
+          clearable
+          placeholder="按文件名查找"
+          @input="searchDebounced"
+          @clear="search"
+          @keyup.enter="search"
+        >
+          <template #prefix><i-ri-search-line /></template>
+        </n-input>
+        <div class="flex-1" />
+        <n-button
+          size="small"
+          type="error"
+          ghost
+          :disabled="!checkedDocs.length"
+          @click="confirmRemove(checkedDocs, '删除选中的文档')"
+        >
+          删除选中{{ checkedDocs.length ? `（${checkedDocs.length}）` : '' }}
+        </n-button>
+        <n-button
+          size="small"
+          type="error"
+          ghost
+          :disabled="!items.length"
+          @click="confirmRemove(items, '删除本页文档')"
+        >
+          删除本页
+        </n-button>
         <n-button size="small" quaternary :loading="loading" @click="load">刷新</n-button>
-      </template>
+      </div>
       <n-data-table
+        v-model:checked-row-keys="checkedIds"
+        remote
         :columns="columns"
-        :data="documents"
+        :data="items"
         :loading="loading"
+        :pagination="pagination"
         :row-key="(d: KbDocument) => d.id"
+        @update:page="(page: number) => update({ page })"
+        @update:page-size="(pageSize: number) => update({ pageSize, page: 1 })"
       />
       <p class="mt-2 text-xs text-muted">
         状态以当前索引版本为准：切换到旧索引后，后来新增或更新过的文档会显示为“待同步”，点“重新入库”即可写入当前索引。

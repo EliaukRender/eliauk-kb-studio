@@ -12,7 +12,8 @@ const router = useRouter()
 const admin = useAdminSessionStore()
 
 const MENU = [
-  { name: 'admin-documents', label: '文档管理' },
+  { name: 'admin-documents', label: '文档列表' },
+  { name: 'admin-upload', label: '上传文档' },
   { name: 'admin-indexes', label: '索引版本' },
   { name: 'admin-eval', label: '回归测试' },
   { name: 'admin-settings', label: '参数设置' },

@@ -19,6 +19,11 @@ export const router = createRouter({
           component: () => import('./views/documents/DocumentsView.vue'),
         },
         {
+          path: 'documents/upload',
+          name: 'admin-upload',
+          component: () => import('./views/upload/UploadView.vue'),
+        },
+        {
           path: 'indexes',
           name: 'admin-indexes',
           component: () => import('./views/indexes/IndexesView.vue'),

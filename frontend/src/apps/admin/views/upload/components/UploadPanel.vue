@@ -6,7 +6,6 @@ import { documentsApi } from '@/apps/admin/api/admin'
 import type { UploadResult } from '@/apps/admin/types'
 import { errorMessage } from '@/shared/utils/format'
 
-const emit = defineEmits<{ uploaded: [] }>()
 const message = useMessage()
 
 const fileList = ref<UploadFileInfo[]>([])
@@ -27,7 +26,6 @@ async function upload() {
   try {
     results.value = await documentsApi.upload(files)
     fileList.value = []
-    emit('uploaded')
   } catch (e) {
     message.error(errorMessage(e))
   } finally {
@@ -37,7 +35,7 @@ async function upload() {
 </script>
 
 <template>
-  <n-card title="上传文档" size="small">
+  <n-card size="small">
     <n-upload
       v-model:file-list="fileList"
       multiple
