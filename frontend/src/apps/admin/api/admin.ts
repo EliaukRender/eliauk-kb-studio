@@ -11,6 +11,7 @@ import type {
   RuntimeSettings,
   UploadResult,
 } from '@/apps/admin/types'
+import type { RequestOptions } from '@/shared/api/http-client'
 
 type TokenResponse = { token: string }
 
@@ -26,10 +27,11 @@ export const documentsApi = {
     const query = new URLSearchParams({ page: String(page), page_size: String(pageSize), keyword })
     return get<DocumentPage>(`/admin/documents?${query}`)
   },
-  upload: (files: File[]) => {
+  upload: (files: File[], options?: RequestOptions) => {
     const form = new FormData()
     files.forEach((f) => form.append('files', f))
-    return post<UploadResult[]>('/admin/documents', form)
+    // 响应要等入库（调用 Embedding）完成才返回，大文件耗时较长，放宽超时
+    return post<UploadResult[]>('/admin/documents', form, { timeout: 10 * 60_000, ...options })
   },
   versions: (id: number) => get<DocumentVersion[]>(`/admin/documents/${id}/versions`),
   rollback: (id: number, version: number) =>

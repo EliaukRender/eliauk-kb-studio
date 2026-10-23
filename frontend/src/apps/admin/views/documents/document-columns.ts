@@ -25,7 +25,7 @@ export function createDocumentColumns(actions: RowActions): DataTableColumns<KbD
     { title: '版本', key: 'current_version', width: 70, render: (d) => `v${d.current_version}` },
     { title: '状态', key: 'status', width: 90, render: renderStatus },
     { title: '块数', key: 'chunk_count', width: 70 },
-    { title: '更新时间', key: 'updated_at', width: 170, render: (d) => formatTime(d.updated_at) },
+    { title: '更新时间', key: 'updated_at', width: 190, render: (d) => formatTime(d.updated_at) },
     {
       title: '操作',
       key: 'actions',

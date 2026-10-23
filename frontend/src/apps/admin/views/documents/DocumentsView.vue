@@ -72,18 +72,24 @@ const pagination = computed<PaginationProps>(() => ({
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <div class="flex items-center justify-between">
-      <h2 class="text-lg font-semibold">文档列表</h2>
+  <!-- 高度限定为可视区域（减去外层 p-6）：表格在内部滚动，分页器固定在底部 -->
+  <div class="flex h-[calc(100vh-3rem)] flex-col gap-4">
+    <div class="flex shrink-0 items-center justify-between">
+      <div>
+        <h2 class="text-lg font-semibold">文档列表</h2>
+        <p class="mt-1 text-xs text-muted">
+          状态以当前索引版本为准：切换到旧索引后，后来新增或更新过的文档会显示为“待同步”，点“重新入库”即可写入当前索引。
+        </p>
+      </div>
       <RouterLink :to="{ name: 'admin-upload' }">
         <n-button type="primary" size="small">上传文档</n-button>
       </RouterLink>
     </div>
-    <n-card size="small">
-      <div class="mb-3 flex flex-wrap items-center gap-2">
+    <n-card size="small" class="min-h-0 flex-1" content-class="flex min-h-0 flex-col">
+      <div class="mb-3 flex shrink-0 flex-wrap items-center gap-2">
         <n-input
           v-model:value="keyword"
-          class="max-w-72"
+          style="width: 18rem"
           size="small"
           clearable
           placeholder="按文件名查找"
@@ -117,6 +123,8 @@ const pagination = computed<PaginationProps>(() => ({
       <n-data-table
         v-model:checked-row-keys="checkedIds"
         remote
+        flex-height
+        class="min-h-0 flex-1"
         :columns="columns"
         :data="items"
         :loading="loading"
@@ -125,9 +133,6 @@ const pagination = computed<PaginationProps>(() => ({
         @update:page="(page: number) => update({ page })"
         @update:page-size="(pageSize: number) => update({ pageSize, page: 1 })"
       />
-      <p class="mt-2 text-xs text-muted">
-        状态以当前索引版本为准：切换到旧索引后，后来新增或更新过的文档会显示为“待同步”，点“重新入库”即可写入当前索引。
-      </p>
     </n-card>
     <VersionDrawer v-model:show="showVersions" :document="selected" @changed="load" />
   </div>
