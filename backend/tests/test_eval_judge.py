@@ -16,3 +16,9 @@ def test_refusal_case():
 
 def test_refusal_answer_fails_normal_case():
     assert not judge("知识库中没有找到相关信息。", ["5 天"], should_refuse=False)
+
+
+def test_ignores_markdown_markup():
+    assert judge("满 1 年享有 **5** 天年假", ["5天"], should_refuse=False)
+    assert judge("### 年假\n- `5 天`", ["5 天"], should_refuse=False)
+    assert judge("**没有找到**相关信息", [], should_refuse=True)

@@ -7,8 +7,8 @@ REFUSAL_MARK = "没有找到"
 
 
 def _normalize(text: str) -> str:
-    # 去掉空白再比较，避免“5 天”和“5天”这类排版差异导致误判
-    return re.sub(r"\s+", "", text)
+    # 去掉空白和 Markdown 标记再比较，避免“**5** 天”和“5天”这类排版差异导致误判
+    return re.sub(r"[\s*_`~#]+", "", text)
 
 
 def judge(answer: str, expected_keywords: list[str], should_refuse: bool) -> bool:
