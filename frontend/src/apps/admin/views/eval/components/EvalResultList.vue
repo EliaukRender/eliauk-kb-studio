@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { EvalReport } from '@/apps/admin/types'
+import MarkdownContent from '@/shared/components/MarkdownContent.vue'
 import { formatPercent } from '@/shared/utils/format'
 
 defineProps<{ report: EvalReport }>()
@@ -25,7 +26,7 @@ defineProps<{ report: EvalReport }>()
       <div class="mb-1 text-xs text-muted">
         期望：{{ r.should_refuse ? '拒答' : r.expected_keywords.join('、') }}
       </div>
-      <div class="whitespace-pre-wrap select-text">{{ r.answer }}</div>
+      <MarkdownContent :source="r.answer" />
       <div v-if="r.sources.length" class="mt-2 text-xs text-muted">
         命中片段：
         <span v-for="(s, i) in r.sources" :key="i" class="mr-3">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ChatMessage } from '@/apps/chat/composables/useChatStream'
+import MarkdownContent from '@/shared/components/MarkdownContent.vue'
 
 import SourceList from './SourceList.vue'
 
@@ -15,7 +16,12 @@ defineProps<{ message: ChatMessage }>()
       <div v-if="message.pending && !message.content" class="flex items-center gap-2 text-muted">
         <n-spin :size="14" /> 检索与思考中…
       </div>
-      <div class="whitespace-pre-wrap select-text">{{ message.content }}</div>
+      <div
+        v-if="message.role === 'user'"
+        class="whitespace-pre-wrap select-text"
+        v-text="message.content"
+      />
+      <MarkdownContent v-else :source="message.content" :streaming="message.pending" />
       <n-alert v-if="message.error" type="error" :bordered="false" class="mt-2">
         {{ message.error }}
       </n-alert>
