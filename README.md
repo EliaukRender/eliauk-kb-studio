@@ -121,6 +121,7 @@ data/                  运行时数据（已 gitignore），删掉即恢复到�
 | [CHANGELOG.md](CHANGELOG.md) | 各版本的变更，每条带模块标签 |
 | [docs/架构设计.md](docs/架构设计.md) | 当前架构：模块、数据模型、流程、取舍 |
 | [docs/adr/](docs/adr/README.md) | 架构决策记录：每个关键决策的背景与理由 |
+| [docs/方案/](docs/方案/) | 子系统方案：设计细节、安全模型、测试与维护约定 |
 | [docs/开发规范.md](docs/开发规范.md) | 边界与分层、命名、测试、Git 工作流、完成标准 |
 | [docs/变更管理.md](docs/变更管理.md) | 模块标签、changelog 书写规范、版本号与发版流程 |
 | [AGENTS.md](AGENTS.md) | AI 编码助手必须遵守的规则（`CLAUDE.md` 引用它） |
