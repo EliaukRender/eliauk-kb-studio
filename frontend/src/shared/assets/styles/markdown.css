@@ -1,0 +1,108 @@
+/* 模型回答的排版，仅作用于 MarkdownContent 容器；颜色取语义变量，自动适配暗色 */
+.md-content {
+  overflow-wrap: anywhere;
+}
+
+.md-content > :first-child {
+  margin-top: 0;
+}
+
+.md-content > :last-child {
+  margin-bottom: 0;
+}
+
+.md-content :where(p, ul, ol, blockquote, pre, table) {
+  margin: 0.5em 0;
+}
+
+.md-content :where(h1, h2, h3, h4, h5, h6) {
+  margin: 0.9em 0 0.4em;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.md-content h1 {
+  font-size: 1.25em;
+}
+
+.md-content h2 {
+  font-size: 1.15em;
+}
+
+.md-content :where(h3, h4, h5, h6) {
+  font-size: 1em;
+}
+
+.md-content :where(ul, ol) {
+  padding-left: 1.4em;
+}
+
+.md-content ul {
+  list-style: disc;
+}
+
+.md-content ol {
+  list-style: decimal;
+}
+
+.md-content li + li {
+  margin-top: 0.2em;
+}
+
+.md-content strong {
+  font-weight: 600;
+}
+
+.md-content a {
+  color: var(--app-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.md-content blockquote {
+  padding-left: 0.8em;
+  border-left: 3px solid var(--app-line);
+  color: var(--app-muted);
+}
+
+.md-content code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--app-elevated);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+.md-content pre {
+  padding: 0.75em 1em;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--app-elevated);
+}
+
+.md-content pre code {
+  padding: 0;
+  background: none;
+}
+
+.md-content hr {
+  margin: 0.8em 0;
+  border: 0;
+  border-top: 1px solid var(--app-line);
+}
+
+.md-content table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.md-content :where(th, td) {
+  padding: 0.35em 0.7em;
+  border: 1px solid var(--app-line);
+}
+
+.md-content th {
+  background: var(--app-elevated);
+  font-weight: 600;
+}
