@@ -28,6 +28,9 @@ CHAT_MODEL = "deepseek:deepseek-flash"
 DASHSCOPE_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
 SUPPORTED_SUFFIXES = (".md", ".txt")
+# 前端同样校验；后端兜底，防止绕过页面直接调用接口
+UPLOAD_MAX_FILES = 10
+UPLOAD_MAX_FILE_BYTES = 10 * 1024 * 1024
 ADMIN_TOKEN_TTL_SECONDS = 8 * 3600
 ADMIN_PASSWORD_MIN_LENGTH = 6
 

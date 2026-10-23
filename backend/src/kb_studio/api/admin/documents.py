@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from kb_studio.auth import require_admin
 from kb_studio.db import documents_repo
 from kb_studio.ingest import incremental
+from kb_studio.settings import UPLOAD_MAX_FILE_BYTES, UPLOAD_MAX_FILES
 
 router = APIRouter(prefix="/api/admin/documents", tags=["admin-documents"], dependencies=[Depends(require_admin)])
 
@@ -41,9 +42,16 @@ def batch_delete(req: BatchDeleteRequest) -> dict:
 # 用同步函数：入库要调用 Embedding 接口，放在 async 里会阻塞事件循环，同步接口由 FastAPI 放进线程池执行
 @router.post("")
 def upload(files: list[UploadFile]) -> list[dict]:
+    if len(files) > UPLOAD_MAX_FILES:
+        raise HTTPException(status_code=400, detail=f"一次最多上传 {UPLOAD_MAX_FILES} 个文件")
     results = []
     for f in files:
-        content = f.file.read()
+        # 多读 1 字节即可判断是否超限，不必把超大文件整个读进内存
+        content = f.file.read(UPLOAD_MAX_FILE_BYTES + 1)
+        if len(content) > UPLOAD_MAX_FILE_BYTES:
+            limit_mb = UPLOAD_MAX_FILE_BYTES // 1024 // 1024
+            results.append({"filename": f.filename, "action": "rejected", "error": f"文件超过 {limit_mb}MB"})
+            continue
         try:
             results.append(incremental.upload_document(f.filename or "untitled.txt", content))
         except incremental.InvalidDocumentError as e:
