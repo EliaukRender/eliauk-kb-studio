@@ -10,6 +10,9 @@ export class ApiError extends Error {
   }
 }
 
+/** 单次请求可覆盖的配置：上传进度、取消、超时 */
+export type RequestOptions = Pick<AxiosRequestConfig, 'onUploadProgress' | 'signal' | 'timeout'>
+
 export type HttpClientOptions = {
   /** 每次请求时读取，返回空字符串表示不带 Authorization */
   getToken?: () => string
@@ -50,7 +53,8 @@ export function createHttpClient(options: HttpClientOptions = {}) {
 
   return {
     get: <T>(url: string) => request<T>({ method: 'GET', url }),
-    post: <T>(url: string, data?: unknown) => request<T>({ method: 'POST', url, data }),
+    post: <T>(url: string, data?: unknown, options?: RequestOptions) =>
+      request<T>({ method: 'POST', url, data, ...options }),
     put: <T>(url: string, data?: unknown) => request<T>({ method: 'PUT', url, data }),
     del: <T>(url: string) => request<T>({ method: 'DELETE', url }),
   }
