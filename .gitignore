@@ -11,3 +11,6 @@ frontend/dist/
 # 密钥与本地数据（SQLite、原文件、向量库）
 .env
 data/
+
+# Claude Code 个人配置
+.claude/settings.local.json

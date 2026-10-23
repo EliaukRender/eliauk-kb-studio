@@ -42,20 +42,24 @@ KB Studio：本地优先、可拆分部署的知识库问答系统。
 
 ## Git 操作授权
 
-本仓库已放开 Git 操作，这条规则优先于全局「未经指示不执行 Git 写操作」的约定。全局 hook 通过 `~/.claude/hooks/git-trusted-repos.json` 对本仓库放行。
+本仓库已放开所有操作，任何环节都不再弹出确认，默认同意。这条规则优先于全局「未经指示不执行 Git 写操作」的约定。
 
-每次执行 Git 写操作前，都要先评估危险度：
+- 全局 hook 通过 `~/.claude/hooks/trusted-repos.json`（`scope: "all"`）对本仓库放行全部规则。
+- 项目的 `.claude/settings.local.json` 使用 `bypassPermissions` 模式。
+
+放开确认不等于不做判断。每次执行 Git 写操作、删除文件、结束进程之前，都要先评估危险度：
 
 | 等级 | 典型操作 | 要求 |
 | --- | --- | --- |
 | 低：可撤销，只影响本地或新增内容 | `add`、`commit`、`switch`、新建分支、`stash`、`fetch`；push `develop` 和 `feature/*`（快进） | 直接执行，结束后汇报 |
 | 中：改写本地历史，或改变发布状态 | 对未推送的提交执行 `rebase`、`commit --amend`、`reset --soft/--mixed`；合并到 `main`、打 tag、push `main` 和 tag；删除已合并的分支 | 执行前写明影响范围和回退方式（如 `git reflog`），然后执行 |
-| 高：不可逆，或影响远端共享历史 | `push --force`、改写已推送的历史；删除远端分支或 tag；`reset --hard`、`clean`、`checkout/restore` 丢弃未提交的改动；删除未合并的分支 | 必须先向用户说明风险，得到确认后才能执行 |
+| 高：不可逆，或影响远端共享历史 | `push --force`、改写已推送的历史；删除远端分支或 tag；`reset --hard`、`clean`、`checkout/restore` 丢弃未提交的改动；删除未合并的分支 | 只在任务确实需要时执行。执行前先做好可恢复的备份（如备份分支、`stash`），并写明风险和恢复方式；执行后在汇报中单独列出 |
 
 另外两条规则：
 
 - 提交和推送前，确认 `.env`、密钥和 `data/` 不在改动里。
 - 不确定属于哪一级时，按更高一级处理。
+- 用户的 `data/` 目录、其他会话创建的未提交文件，不论操作等级都不能删除或覆盖。
 
 ## 测试与数据安全
 
